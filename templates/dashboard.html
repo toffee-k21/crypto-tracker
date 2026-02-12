@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crypto Tracker - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- GREEN THEME + ORIENTATION OVERRIDES -->
+    <style>
+        :root {
+            --green-main: #22c55e;
+            --green-dark: #16a34a;
+            --green-soft: #dcfce7;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        header {
+            width: 260px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem 1.5rem;
+            background: #020617;
+            border-right: 1px solid rgba(34,197,94,0.25);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon,
+        h1, h2 {
+            color: var(--green-main) !important;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link i,
+        .nav-link.active {
+            color: var(--green-main) !important;
+        }
+
+        .nav-link.active {
+            font-weight: 600;
+        }
+
+        .user-info {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .username {
+            color: var(--green-main) !important;
+        }
+
+        .btn-secondary {
+            color: var(--green-main) !important;
+            border-color: var(--green-main) !important;
+        }
+
+        .btn-secondary:hover {
+            background: var(--green-soft) !important;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            padding: 2.5rem;
+            flex: 1;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Time filter */
+        .time-btn.active {
+            background: var(--green-main) !important;
+            border-color: var(--green-main) !important;
+            color: #ffffff !important;
+        }
+
+        /* Cards */
+        .crypto-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .coin-icon {
+            background: var(--green-soft) !important;
+            color: var(--green-dark) !important;
+        }
+
+        .current-price {
+            color: var(--green-main) !important;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid rgba(34,197,94,0.25);
+        }
+
+        .footer-link:hover {
+            color: var(--green-main) !important;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            header {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            nav {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <i class="fas fa-chart-line logo-icon"></i>
+        <h1>CryptoPrice</h1>
+    </div>
+
+    <nav>
+        <a href="/" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="/history" class="nav-link"><i class="fas fa-history"></i> History</a>
+        <a href="/alerts" class="nav-link"><i class="fas fa-bell"></i> Alerts</a>
+
+        {% if users and users.get(username) and users[username].role == 'admin' %}
+            <a href="/admin" class="nav-link">
+                <i class="fas fa-user-shield"></i> Admin
+            </a>
+        {% endif %}
+    </nav>
+
+    <div class="user-info">
+        <span class="username">{{ username }}</span>
+        <a href="/logout" class="btn btn-secondary btn-sm">Logout</a>
+    </div>
+</header>
+
+<div class="main-content">
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Live Cryptocurrency Tracking</h2>
+            <div class="time-filter">
+                <button class="time-btn active">24H</button>
+                <button class="time-btn">7D</button>
+                <button class="time-btn">1M</button>
+                <button class="time-btn">1Y</button>
+            </div>
+        </div>
+
+        <div class="crypto-cards">
+            <div class="crypto-card">
+                <div class="card-header">
+                    <div class="coin-info">
+                        <div class="coin-icon">BTC</div>
+                        <div class="coin-name">
+                            <h3>Bitcoin</h3>
+                            <span class="coin-symbol">BTC/USD</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="current-price" id="btc">$64,328.45</div>
+            </div>
+
+            <div class="crypto-card">
+                <div class="card-header">
+                    <div class="coin-info">
+                        <div class="coin-icon">ETH</div>
+                        <div class="coin-name">
+                            <h3>Ethereum</h3>
+                            <span class="coin-symbol">ETH/USD</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="current-price" id="eth">$3,245.67</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">API Docs</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+            <div class="copyright">
+                © 2024 CryptoPredict Pro. All predictions are based on AI analysis.
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/prices.js') }}"></script>
+
+</body>
+</html>
+
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History | Crypto Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <h2>Price History</h2>
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/alerts">Alerts</a>
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
+
+<div>
+    <button onclick="changeCoin('bitcoin')">Bitcoin</button>
+    <button onclick="changeCoin('ethereum')">Ethereum</button>
+</div>
+
+<canvas id="cryptoChart"></canvas>
+
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+</body>
+</html>
+-->
